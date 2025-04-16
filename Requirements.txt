@@ -5,4 +5,3 @@ xgboost==2.0.0
 shap==0.42.1 
 seaborn==0.12.2 
 matplotlib==3.7.2
-tensorflow==2.12.0
