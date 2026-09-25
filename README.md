@@ -14,3 +14,226 @@ Abstract
 
 Climate change poses significant challenges to building performance, necessitating adaptive strategies to optimize energy efficiency, emissions, and occupant comfort under evolving conditions. This study introduces a machine learning framework leveraging transfer learning to predict and optimize five key building performance indicators— Primary Energy Consumption (PEC, kWh), CO₂-equivalent Emissions (kg), Indoor Air Quality (IAQ, ppm), Predicted Percentage of Dissatisfied (PPD, %), and Visual Discomfort Hours (VDH, hr)—for 2050 and 2080 climate scenarios. Using a synthetic dataset of approximately 3,700 building configurations (1,826 current, ~900 for 2050, ~1,000 for 2080, generated from EnergyPlus via jEPlus+EA), we pre-trained Random Forest, XGBoost, and Deep Neural Network (DNN) models on present data and finetuned them with limited future samples (200–500). The models achieved R² values of 0.80–0.95 and reduced prediction times from hours (simulations) to seconds, with RMSE improvements of 10–20% over defaults. SHAP analysis identified dynamic ventilation (P9), efficient HVAC (e.g., VRF-DOAS, P25), and advanced insulation (e.g., RoofwithInsulationBatt244mm, P10) as primary drivers. Scenario analysis with 100 bootstrap iterations revealed trade-offs, such as high-resilience designs increasing PEC by up to 39% in 2080 while reducing PPD by up to 26%. Transfer learning enhanced efficiency, reducing retraining overhead significantly. Calibration metrics (e.g., NMBE <5%, CV(RMSE) <15%) were met, though limitations include synthetic data reliance and the need for real-world validation. This framework aids architects in designing climateresilient buildings toward net-zero by 2050. Future work includes real-time integration and multi-climate field studies.
 
+Abstract
+
+# Future-Climate Reliability and Data-Efficient Adaptation
+# Data-Efficient Adaptation of Building Performance Surrogates under Climate-Induced Domain Shift: Quantifying the Future-Simulation Budget
+
+The central research question is:
+
+How much future-climate simulation data are required to adapt an existing building-performance surrogate while maintaining reliable predictive performance?
+
+The study evaluates three surrogate families:
+
+Random Forest
+
+XGBoost
+
+Deep Neural Network (DNN)
+
+A total of three synthetic climate-specific datasets are considered:
+
+Climate condition	Simulations
+Present climate	1,826
+2050	909
+2080	991
+The same 107 design and system input features are used across the climate conditions, while five performance targets are predicted simultaneously:
+
+Primary Energy Consumption (PEC)
+
+CO₂-equivalent emissions
+
+Indoor Air Quality (zone CO₂)
+
+Predicted Percentage of Dissatisfied (PPD)
+
+Visual Discomfort Hours (VDH)
+
+Future weather files are generated using CCWorldWeatherGen v1.9, based on a Meteonorm baseline weather file and HadCM3 climate-change factors under the SRES A2 scenario.
+
+Experimental Framework
+The future-climate experiments compare five modelling regimes:
+
+1. Zero-shot deployment
+Models trained exclusively on present-climate simulations are directly applied to future-climate test data without adaptation.
+
+2. Future-only training
+Models are trained from scratch using only a limited number of future-climate simulations.
+
+3. Pooled training
+Present- and future-climate samples are combined and used to retrain the tree-based models.
+
+4. DNN transfer learning
+A DNN trained on present-climate data is fine-tuned using a limited number of future-climate simulations.
+
+Different layer-freezing strategies are also evaluated to examine how much of the source representation can be retained during adaptation.
+
+5. Full-future reference
+Models trained using the complete future-climate adaptation pool provide a reference for evaluating the performance recovered by data-efficient adaptation.
+
+Future Simulation Budget
+A central feature of this study is the explicit conversion of future-data fractions into additional EnergyPlus simulations.
+
+Future adaptation is evaluated at:
+
+5%
+
+10%
+
+20%
+
+30%
+
+50%
+
+75%
+
+100%
+
+For example:
+
+5% = 36 simulations for 2050
+
+5% = 40 simulations for 2080
+
+30% = 218 simulations for 2050
+
+30% = 238 simulations for 2080
+
+This allows model adaptation to be interpreted not only in terms of data percentage, but also in terms of the computational budget required to generate additional physics-based simulations.
+
+Climate-Induced Domain Shift
+The study evaluates predictive degradation when present-climate surrogates are deployed under future climates.
+
+Domain changes are examined using:
+
+Squared Maximum Mean Discrepancy (MMD²)
+
+Target-distribution changes
+
+Zero-shot R² degradation
+
+RMSE and MAE
+
+Mean Bias Error (MBE)
+
+CV(RMSE)
+
+Spearman rank correlation
+
+Bootstrap confidence intervals are also calculated for key zero-shot configurations.
+
+The analysis indicates that climate-induced performance degradation is target-dependent. Thermal comfort prediction, particularly PPD, shows substantially greater degradation than indoor-air-quality prediction under the tested future-climate scenarios.
+
+The study therefore treats surrogate reliability as a multi-output and target-dependent problem, rather than assuming that climate shift affects all building-performance indicators equally.
+
+Main Findings
+Under the tested building and climate-scenario setting:
+
+Present-climate models experience measurable degradation when deployed zero-shot under future climates.
+
+Mean relative R² losses are approximately 10–27% for 2050 and 29–33% for 2080, depending on model family.
+
+Thermal comfort (PPD) exhibits particularly strong degradation under the 2080 climate.
+
+Indoor-air-quality prediction is comparatively stable.
+
+DNN transfer learning provides substantial data-efficiency benefits when future-climate data are scarce.
+
+At very low future-data fractions, transfer learning can substantially outperform DNN training from scratch.
+
+Pooled present+future training improves the data efficiency of tree-based models, particularly XGBoost.
+
+The adaptation framework explicitly links predictive recovery to the number of additional EnergyPlus simulations required.
+
+The results are intended to provide an empirical basis for budgeting future-climate simulations when adapting building-performance surrogate models.
+
+Reproducibility
+This repository provides the computational materials required to reproduce the reported analyses, including:
+
+Synthetic datasets
+
+Data preprocessing procedures
+
+Random Forest implementation
+
+XGBoost implementation
+
+Deep Neural Network implementation
+
+Transfer-learning workflows
+
+Layer-freezing experiments
+
+Data-efficiency analysis
+
+Domain-shift analysis
+
+SHAP-based interpretability
+
+Bootstrap uncertainty quantification
+
+Performance evaluation scripts
+
+Visualisation scripts
+
+Model configuration and hyperparameter settings
+
+The future-climate study uses fixed test sets and repeated random seeds to improve reproducibility and reduce dependence on a single stochastic training run.
+
+Data and Code Availability
+The synthetic datasets and computational materials associated with this research are publicly archived through GitHub and Zenodo.
+
+Zenodo DOI:
+10.5281/zenodo.20958845
+
+GitHub:
+F-Dhghn/Building-Performance-ML-2025
+
+The repository is intended to support reproducible research on:
+
+Building-performance surrogate modelling
+
+Machine learning for EnergyPlus acceleration
+
+Climate-resilient building simulation
+
+Domain shift and model reliability
+
+Transfer learning
+
+Data-efficient adaptation
+
+Simulation-budget optimisation
+
+Multi-objective building performance prediction
+
+Research Scope and Limitations
+The future-climate experiments are based on synthetic EnergyPlus datasets generated for a controlled building and climate-scenario setting. Future weather conditions are represented using the HadCM3 / SRES A2 climate pathway through CCWorldWeatherGen.
+
+Accordingly, the reported adaptation budgets should be interpreted as scenario- and case-specific empirical results, rather than universal simulation requirements.
+
+Future extensions include:
+
+Multi-GCM and multi-scenario climate ensembles
+
+CMIP5/CMIP6 climate projections
+
+Additional building typologies and climate regions
+
+Extreme-weather and heat-wave stress testing
+
+Active learning for selecting informative future simulations
+
+Multi-source and advanced domain-adaptation methods
+
+Physics-informed machine learning
+
+Validation against monitored real-building data
+
+Data-Efficient Adaptation of Building Performance Surrogates under Climate-Induced Domain Shift: Quantifying the Future-Simulation Budget.
+
+Research Theme
+EnergyPlus → Machine Learning → Domain Shift → Transfer Learning → Climate-Resilient Building Performance
+
+The broader research objective is to develop computationally efficient and scientifically interpretable surrogate-modelling frameworks capable of supporting building design and optimisation under changing climatic conditions.
